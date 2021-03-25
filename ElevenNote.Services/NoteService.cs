@@ -36,8 +36,9 @@ namespace ElevenNote.Services
             var query = _context.Notes.Where(x => x.OwnerId == _userId)
                                         .Select(x => new NoteListItem
                                         {
-                                            NoteId = x.NoteId,
-                                            Title = x.Title,
+                                            NoteId =    x.NoteId,
+                                            Title =     x.Title,
+                                            IsStarred = x.IsStarred,
                                             CreatedUtc = x.CreatedUtc
                                         });
             return query.ToArray();
@@ -63,9 +64,20 @@ namespace ElevenNote.Services
                                                     x.OwnerId == _userId);
             entity.Title =      model.Title;
             entity.Content =    model.Content;
+            entity.IsStarred = model.IsStarred;
             entity.ModifiedUtc = DateTimeOffset.UtcNow;
 
             return _context.SaveChanges() == 1;
         }
+
+        public bool DeleteNote(int id)
+        {
+            var entity = _context.Notes.Single(x => x.NoteId == id &&
+                                                    x.OwnerId == _userId);
+            _context.Notes.Remove(entity);
+            return _context.SaveChanges() == 1;
+        }
+
+
     }
 }

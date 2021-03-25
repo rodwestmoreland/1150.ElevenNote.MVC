@@ -19,14 +19,21 @@ namespace ElevenNoteWebMVC.Controllers
             return service;
         }
 
+        private ActionResult GetNoteById(int id)
+        {
+            NoteService service = VerifyUserThenGetService();
+            var model = service.GetNoteById(id);
+            return View(model);
+        }
+
         public ActionResult Create() => View();
+
         public ActionResult Index()
         {
             NoteService service = VerifyUserThenGetService();
             var model = service.GetNotes(); 
             return View(model);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -48,9 +55,28 @@ namespace ElevenNoteWebMVC.Controllers
 
         public ActionResult Details(int id)
         {
-            NoteService service = VerifyUserThenGetService();
-            var model = service.GetNoteById(id);
-            return View(model);
+            return GetNoteById(id);
+        }
+
+        [ActionName("Delete")]
+        public ActionResult Delete(int id)
+        {
+            return GetNoteById(id);
+        }
+
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeletePost(int id)
+        {
+            var service = VerifyUserThenGetService();
+
+            service.DeleteNote(id);
+
+            TempData["SaveResult"] = "Your note was deleted";
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult Edit(int id)
